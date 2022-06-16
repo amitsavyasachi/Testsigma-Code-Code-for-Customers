@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import com.jayway.jsonpath.JsonPath;
@@ -18,9 +20,11 @@ public class AirMeetApi extends TestsigmaCustomFunctions {
 
   TestStepResult result = new TestStepResult();
   
+  AndroidDriver d = (AndroidDriver)driver;
+  
 	@CustomTestStep
-	public TestStepResult checkeventstatus(String EventURLforAPI , String XpathofElement) throws TestEngineException {
-		 AndroidDriver d = (AndroidDriver)driver;	
+	public TestStepResult validateeventstatus(String EventURLforAPI , String XpathofElement) throws TestEngineException {
+		 	
       try {
     	 
     	  OkHttpClient client = new OkHttpClient().newBuilder()
@@ -117,11 +121,51 @@ public class AirMeetApi extends TestsigmaCustomFunctions {
        	
 		return result;
 	}
+		@CustomTestStep
+	public TestStepResult validatespeakerlist(String EventURLforAPI, String XpathofSpeakerName) {
+			
+			 try {
+		    	 
+		    	  OkHttpClient client = new OkHttpClient().newBuilder()
+						  .build();
+						MediaType mediaType = MediaType.parse("text/plain");
+						//RequestBody body = RequestBody.create(mediaType, "");
+						Request request = new Request.Builder()
+						  .url(EventURLforAPI)
+						  .method("GET", null)
+						  .addHeader("Cookie", "__cf_bm=ZbVcZPu5EGlPoTiv8S7COt2r9pwqtJeliiuMA6EHrSw-1655113754-0-AcGem2SRct4g+MKkaS42dVIHfu+Y2qNly05omKC/eCxEvPvtrGprPGkwuDjq8zGLV0FIZZv0uFwAaHXXdrW0LLU=; _cfuvid=II4gnYbhnG4OfqASe74Xqt1ECwQBcqFMS_Gnq_GGlj4-1655113754383-0-604800000")
+						  .build();
+						Response response = client.newCall(request).execute();
+						
+						
+					String responsebody=response.body().string();
+					
+					WebElement wb = d.findElement(By.xpath(""+XpathofSpeakerName+""));
+					String value = wb.getText();
+					
+					 ArrayList<String> speakerarr=	JsonPath.parse(responsebody).read("$.sessions[*].speakerList[*].name");
+					 
+					 if(speakerarr.contains(value)) {
+						 result.setStatus(ResultConstants.SUCCESS);
+						 result.setMessage("Speaker with name "+value+" is found in the API response");
+					 }else {
+						 result.setStatus(ResultConstants.FAILURE);
+						 result.setMessage("Speaker with name "+value+" is not found in the API response");
+					 }
+					 
+			 }
+					 
+					 catch(Exception e) {
+						 result.setStatus(ResultConstants.FAILURE);
+				    	  result.setMessage(e.getMessage());
+				    	 
+						 
+					 }
+			
 	
-//	@CustomTestStep
-//	public TestStepResult validatespeakerlist() {
-//		return result;
-//		
-//	}
+			
+		return result;
+	
+}
   
 }
