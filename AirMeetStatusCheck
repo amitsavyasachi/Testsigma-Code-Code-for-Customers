@@ -19,7 +19,7 @@ public class AirMeetApi extends TestsigmaCustomFunctions {
   TestStepResult result = new TestStepResult();
   
 	@CustomTestStep
-	public TestStepResult loadhomepage1(String EventURLforAPI , String XpathofElement) throws TestEngineException {
+	public TestStepResult checkeventstatus(String EventURLforAPI , String XpathofElement) throws TestEngineException {
 		 AndroidDriver d = (AndroidDriver)driver;	
       try {
     	 
